@@ -2,6 +2,8 @@
 // PrimeCPP.cpp : Dave's Garage Prime Sieve in C++ - No warranty for anything!
 // ---------------------------------------------------------------------------
 
+#define _XOPEN_SOURCE_EXTENDED 1
+
 #include <stdio.h>
 #include <ctime>
 #include <iostream>
