@@ -2,7 +2,6 @@
 // PrimeCPP.cpp : Dave's Garage Prime Sieve in C++ - No warranty for anything!
 // ---------------------------------------------------------------------------
 
-#include <chrono>
 #include <ctime>
 #include <iostream>
 #include <bitset>
@@ -10,9 +9,9 @@
 #include <cstring>
 #include <cmath>
 #include <vector>
+#include <sys/time.h>
 
 using namespace std;
-using namespace std::chrono;
 
 class prime_sieve
 {
@@ -20,7 +19,7 @@ class prime_sieve
 
       long sieveSize = 0;
       vector<bool> Bits;
-      const std::map<const long long, const int> resultsDictionary = 
+      const std::map<const long long, const int> resultsDictionary =
       {
             {          10LL, 4         },               // Historical data for validating our results - the number of primes
             {         100LL, 25        },               // to be found under some limit, such as 168 primes under 1000
@@ -45,7 +44,7 @@ class prime_sieve
 
    public:
 
-      prime_sieve(long n) 
+      prime_sieve(long n)
         : Bits(n, true), sieveSize(n)
       {
       }
@@ -95,7 +94,7 @@ class prime_sieve
           if (showResults)
               printf("\n");
 
-          printf("Passes: %d, Time: %lf, Avg: %lf, Limit: %ld, Count1: %d, Count2: %d, Valid: %d\n", 
+          printf("Passes: %d, Time: %lf, Avg: %lf, Limit: %ld, Count1: %d, Count2: %d, Valid: %d\n",
                  passes,
                  duration,
                  duration / passes,
@@ -105,7 +104,7 @@ class prime_sieve
                  validateResults());
 
           // Following 2 lines added by rbergen to conform to drag race output format
-          printf("\n");       
+          printf("\n");
           printf("davepl;%d;%f;1;algorithm=base,faithful=yes,bits=1\n", passes, duration);
       }
 
@@ -122,17 +121,27 @@ class prime_sieve
 int main()
 {
     auto passes = 0;
-    auto tStart = steady_clock::now();
+    //auto tStart = steady_clock::now();
+
+    timeval tim;
+    gettimeofday(&tim,NULL);
+
+    double tstart = tim.tv_sec + ((double)tim.tv_usec/1000000);
+
 
     while (true)
     {
         prime_sieve sieve(1000000L);
         sieve.runSieve();
         passes++;
-        if (duration_cast<seconds>(steady_clock::now() - tStart).count() >= 5)
+        timeval now;
+        gettimeofday(&now,NULL);
+        double tnow = now.tv_sec + ((double)now.tv_usec/1000000);
+
+        if (tnow - tstart >= 5)
         {
-            sieve.printResults(false, duration_cast<microseconds>(steady_clock::now() - tStart).count() / 1000000.0, passes);
+            sieve.printResults(false, (tnow - tstart), passes);
             break;
         }
-    } 
+    }
 }
