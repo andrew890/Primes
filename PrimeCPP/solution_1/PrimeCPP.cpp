@@ -40,7 +40,7 @@ class prime_sieve
       void runSieve()
       {
           int factor = 3;
-          int q = (int) sqrt(sieveSize);
+          int q = (int) sqrt((double)sieveSize);
 
           while (factor <= q)
           {
