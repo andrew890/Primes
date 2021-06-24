@@ -13,6 +13,7 @@
 #include <cmath>
 #include <vector>
 #include <sys/time.h>
+#include <string>
 
 using namespace std;
 
