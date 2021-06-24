@@ -21,22 +21,40 @@ class prime_sieve
   private:
 
       long sieveSize;
-      vector<bool> Bits;
+      unsigned char* rawbits;
 
       bool validateResults()
       {
           return 78498 == countPrimes();
       }
 
+      bool GetBit(unsigned int index)
+      {
+          if (index % 2 == 0)
+              return false;
+          index = index / 2;
+          return ((rawbits[index / 8]) & (1 << (index % 8))) != 0;
+      }
+
+      void ClearBit(unsigned int index)
+      {
+          index = index / 2;
+          rawbits[index / 8] &= ~(1 << (index % 8));
+      }
+
    public:
 
       prime_sieve(long n)
-        : Bits(n, true), sieveSize(n)
+          : sieveSize(n)
       {
+          rawbits = (unsigned char*)malloc(n / 8 + 1);
+          if (rawbits)
+              memset(rawbits, 0xff, n / 8 + 1);
       }
 
       ~prime_sieve()
       {
+          free(rawbits);
       }
 
       void runSieve()
@@ -48,14 +66,14 @@ class prime_sieve
           {
               for (int num = factor; num < sieveSize; num += 2)
               {
-                  if (Bits[num])
+                  if (GetBit(num))
                   {
                       factor = num;
                       break;
                   }
               }
               for (int num = factor * factor; num < sieveSize; num += factor * 2)
-                  Bits[num] = false;
+                  ClearBit(num);
 
               factor += 2;
           }
@@ -69,7 +87,7 @@ class prime_sieve
           int count = (sieveSize >= 2);                             // Starting count (2 is prime)
           for (int num = 3; num <= sieveSize; num+=2)
           {
-              if (Bits[num])
+              if (GetBit(num))
               {
                   if (showResults)
                       printf("%d, ", num);
@@ -98,7 +116,7 @@ class prime_sieve
       {
           int count =  (sieveSize >= 2);;
           for (int i = 3; i < sieveSize; i+=2)
-              if (Bits[i])
+              if (GetBit(i))
                   count++;
           return count;
       }
