@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -5,30 +6,23 @@ public class PrimeSieveJava
 {
 	private static final Map<Integer, Integer> VALIDATION_DATA;
 	
-	// Java has a BitSet class included but switching to a boolean array of size improves performance by a lot
-	// This brings the limitation of the sieve only being able to test numbers up to Integer.MAX_VALUE - 2 (Requested array size exceeds VM limit)
-	private final boolean[] dataSet;
+	private final byte[] rawbits;
 	private final int sieveSize;
 	
 	public PrimeSieveJava(int sieveSize)
 	{
 		this.sieveSize = sieveSize;
-		// unlike the other old implementations the dataSet isn't initialized with true values to optimize speed
-		dataSet = new boolean[(sieveSize + 1) >> 1];
+		rawbits = new byte[sieveSize / 8 / 2];
+		Arrays.fill(rawbits, (byte)0xFF);
 	}
 	
 	public int countPrimes()
 	{
-		int count = 0;
-		for (int i = 0; i < dataSet.length; i++)
-		{
-			if (!dataSet[i])
-			{
-				count++;
-			}
-		}
-		
-		return count;
+        int count =  (sieveSize >= 2) ? 1 : 0;
+        for (int i = 3; i < sieveSize; i+=2)
+            if (getBit(i))
+                count++;
+        return count;
 	}
 	
 	public boolean validateResults()
@@ -46,15 +40,19 @@ public class PrimeSieveJava
 	// Also rather interesting: checking index % 2 != 0 is slower than index % 2 == 1
 	private boolean getBit(int index)
 	{
-		return (index & 1) == 1 && !dataSet[index >> 1];
+        if (index % 2 == 0)
+            return false;
+        index = index / 2;
+        return ((rawbits[index / 8]) & (1 << (index % 8))) != 0;
 	}
 	
 	// Again instead of checking if index is even we just update the array at that index equivalent to that check
 	// to boost performance
 	private void clearBit(int index)
 	{
-		dataSet[index >> 1] = (index & 1) == 1;
-	}
+        index = index / 2;
+        rawbits[index / 8] &= ~(1 << (index % 8));
+    }
 	
 	public void runSieve()
 	{
